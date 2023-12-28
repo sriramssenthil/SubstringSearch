@@ -1,0 +1,1 @@
+Function to search for a substring within a string, improving upon the Brute-Force ( Runtime: O(nm) )  approach of comparing character by character. Utilizes a polynomial rolling has function to calculate the hashes and update the hashes. The final function achieves a runtime of O(n+m).  
