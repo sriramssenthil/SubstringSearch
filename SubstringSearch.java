@@ -19,7 +19,6 @@ public class SubstringSearch{
         int tHash = hash(t.substring(0,subLength), x , prime);
 
         for(int i = 0; i<t.length()-s.length(); i++){
-            tHash = hash(t.substring(i, i+subLength), x, prime);
             if (tHash == subHash){
                 // Check for collisions
                 if (t.substring(i,i+subLength).equals(s)){
@@ -30,9 +29,9 @@ public class SubstringSearch{
 
             //Calculate hash of next substring without recalculating the entire hash
             // Subtraction of two polynomial rolling hashes
-            // tHash = (tHash * x)%prime;
-            // tHash = (tHash - (t.charAt(i) * (int)Math.pow(x, subLength)))%prime;
-            // tHash = (tHash + t.charAt(+subLength))%prime;
+            tHash = (tHash * x)%prime;
+            tHash = (tHash - (t.charAt(i) * (int)Math.pow(x, subLength)))%prime;
+            tHash = (tHash + t.charAt(+subLength))%prime;
             
         }
         System.out.println(tHash);
