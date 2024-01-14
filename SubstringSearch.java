@@ -4,7 +4,7 @@ public class SubstringSearch{
 
     // Runtime: O(n+m)
     // Implementation of String.indexOf() through the usage of polynomial rolling hashes
-    // Returns the starting index of a substring s in String t or -1 if the substring does not occur
+    // RETURNS the starting index of a substring s in String t or -1 if the substring does not occur
     public static int search(String textStr, String searchStr){
         int subLength = searchStr.length();
 
@@ -19,19 +19,10 @@ public class SubstringSearch{
             return -1;
         }
 
-             
+       
         // Utilizes a polynomial rolling hash
         long subHash = hash(searchStr, x, modulo);
         long tHash = hash(textStr.substring(0,subLength), x , modulo);
-
-        // Keeping the hash values positive to prevent comparing negative and positive hashes
-        if(subHash<0){
-            subHash+=modulo;
-        }
-
-        if(tHash<0){
-            tHash+=modulo;
-        }
         
 
         // for-loop to iterate through all hashes in the substrings of length subLength in textStr
@@ -66,6 +57,7 @@ public class SubstringSearch{
 
 
     // Calculation of the polynomial rolling hash
+    // Polynomial rolling hash is a type of hash function that only uses addition and multiplication
     // Read more: https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-function/
     public static long hash(String s, long x, long modulo){
         long hash = 0;
@@ -77,6 +69,11 @@ public class SubstringSearch{
             pow = (pow * x) % modulo;
         }
 
+        // Keeping the hash values positive to prevent comparing negative and positive hashes
+        if(hash<0){
+            hash+=modulo;
+        }
+
         return hash;
     
     }
@@ -85,7 +82,7 @@ public class SubstringSearch{
         System.out.println(hash("Nhi", 53, 1000000007));
         System.out.println("");
 
-        int x = search("thisIsn'tatest", "'ta");
+        int x = search("thisIsn'tatest", "Isn");
 
         System.out.println(x);
     }
