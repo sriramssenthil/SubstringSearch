@@ -3,55 +3,78 @@
 public class SubstringSearch{
 
     // Runtime: O(n+m)
-    // Implementation of String.indexOf()
+    // Implementation of String.indexOf() through the usage of polynomial rolling hashes
     // Returns the starting index of a substring s in String t or -1 if the substring does not occur
-    public static int search(String t, String s){
-        int subLength = s.length();
+    public static int search(String textStr, String searchStr){
+        int subLength = searchStr.length();
 
-        if(t.length() == 0 || subLength > t.length()){
+        // Two prime values used for the building and evaluating the polynomial hash
+        // x is the argument of the polynomial
+        // modulo is the modulo to prevent overflow
+        final long x = 53;
+        final long modulo = 1000000007;   
+
+        // Case to terminate early
+        if(textStr.length() == 0 || subLength > textStr.length()){
             return -1;
         }
 
-        int x = 53;
-        int prime = 1000000007;        
-
+             
         // Utilizes a polynomial rolling hash
-        long subHash = hash(s, x, prime);
-        long tHash = hash(t.substring(0,subLength), x , prime);
+        long subHash = hash(searchStr, x, modulo);
+        long tHash = hash(textStr.substring(0,subLength), x , modulo);
 
-        for(int i = 0; i<t.length()-s.length()+1; i++){
+        // Keeping the hash values positive to prevent comparing negative and positive hashes
+        if(subHash<0){
+            subHash+=modulo;
+        }
+
+        if(tHash<0){
+            tHash+=modulo;
+        }
+        
+
+        // for-loop to iterate through all hashes in the substrings of length subLength in textStr
+        // Given n = length of text string and m = length of search string: 
+        //  for-loop runs a total of n(1+(m/modulo)*m) times as there is a maximum of m/modulo collisions
+        // CChoosing modulo > m^2 allows us to optimize the run-time
+        for(int i = 0; i<textStr.length()-searchStr.length()+1; i++){
+                           
+            // Check for collisions
             if (tHash == subHash){
-                // Check for collisions
-                if (t.substring(i,i+subLength).equals(s)){
-                    //System.out.println(tHash);
+                // Runs a maximum of once in O(m) time
+                if (textStr.substring(i,i+subLength).equals(searchStr)){
                     return i;
                 }
             }
 
-
             //Optimization to calculate hash of next substring without recalculating the entire hash
             //Subtraction of two polynomial rolling hashes
-            tHash = (tHash - ((t.charAt(i)  - 'a' + 1) * (long)Math.pow(x, subLength-1)))%prime;
-            tHash = (tHash * x)%prime;
-            tHash = (tHash + t.charAt(i+subLength)  - 'a' + 1)%prime;
-            //System.out.println(tHash);
+            tHash = (tHash - ((textStr.charAt(i)  - 'a' + 1) * (long)Math.pow(x, subLength-1)))%modulo;
+            if(tHash<0){
+                tHash+=modulo;
+            }
+            tHash = (tHash * x)%modulo;
 
-
-            
-            
+            if((i+subLength<textStr.length())){
+                tHash = (tHash + textStr.charAt(i+subLength)  - 'a' + 1)%modulo;
+            }
         }
+        // If substring is not found
         return -1;
     }
 
+
     // Calculation of the polynomial rolling hash
-    public static long hash(String s, int x, int prime){
+    // Read more: https://www.geeksforgeeks.org/string-hashing-using-polynomial-rolling-hash-function/
+    public static long hash(String s, long x, long modulo){
         long hash = 0;
         long pow  = 1;
 
         // Addition of each term in the polynomial
         for (int i=s.length()-1; i>=0; i--){
-            hash = ((hash + ((s.charAt(i)) - 'a' + 1) * pow) % prime);
-            pow = (pow * x) % prime;
+            hash = ((hash + ((s.charAt(i)) - 'a' + 1) * pow) % modulo);
+            pow = (pow * x) % modulo;
         }
 
         return hash;
@@ -59,10 +82,10 @@ public class SubstringSearch{
     }
 
     public static void main(String[] args){
-        // System.out.println(hash("is", 53, 1000000007));
-        // System.out.println(hash("th", 53, 1000000007));
+        System.out.println(hash("Nhi", 53, 1000000007));
+        System.out.println("");
 
-        int x = search("abcdefghijklmnop", "defgh");
+        int x = search("thisIsn'tatest", "'ta");
 
         System.out.println(x);
     }
